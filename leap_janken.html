@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>LeapMotionでカンタンじゃんけんゲーム</title>
+</head>
+<body>
+<style type="text/css">
+    body {
+        text-align: center;
+        margin: auto;
+    }
+
+</style>
+<script src="http://js.leapmotion.com/leap-0.6.4.js"></script>
+<script src="http://js.leapmotion.com/leap-plugins-0.1.10.js"></script>
+<div id="main">
+<h1>カンタンじゃんけんゲーム</h1>
+<div id="result" style="margin-top: 3rem;"></div>
+<form>
+    <input type="button" value="もう一度" onclick="location.reload();">
+</form>
+</div>
+<script>
+// じゃんけんゲームのスクリプト
+
+var hand = new Array('グー', 'チョキ', 'パー');
+var result = new Array('あいこ', '負け', '勝ち');
+
+// 相手の手をランダム設定
+var enemyChoice = Math.floor(Math.random() * 3);
+
+// 勝敗判定
+var judge = ( hand - enemyChoice + 3 ) % 3;
+
+
+
+// 出力
+var out = document.getElementById('result');
+
+// Leap.loopメソッド
+Leap.loop({  // ジェスチャー認識するかどうかのオプション
+    enableGestures : true
+}, function(frame) {  // フレーム毎の処理
+    var handsLength = frame.hands.length; // 認識した手の数
+
+    for (var i = 0; i < handsLength; i++){
+        var fgs = frame.hands[i].fingers.length; 
+        //var fgs = frame.hands[i].fingers.length;// 認識した指の数
+        var extendedFingers = 0;
+        for(var f = 0; f < fgs; f++){
+            var finger = frame.hands[i].fingers[f];
+            if(finger.extended) extendedFingers++;
+        }
+        console.log("Extended fingers: " + extendedFingers);
+
+        if(extendedFingers === 0){  // 指が4本以上なら「パー」
+            
+            console.log("グー");
+            out.innerHTML = '<p>あなた：<b>' + hand[0] + '</b></p>' +
+                      '<p>あいて：<b>' + hand[enemyChoice] + '</b></p>' 
+                      //+ '<p><b>' + result[judge] + '</b>です</p>';
+        } else if(extendedFingers === 2){  // 指が2,3本なら「チョキ」
+            
+            console.log("チョキ");
+             out.innerHTML = '<p>あなた：<b>' + hand[1] + '</b></p>' +
+                       '<p>あいて：<b>' + hand[enemyChoice] + '</b></p>' 
+                       // + '<p><b>' + result[judge] + '</b>です</p>';
+        } else if(extendedFingers === 5){  // 指が0,1本なら「グー」   
+            
+            console.log("パー");
+            out.innerHTML = '<p>あなた：<b>' + hand[2] + '</b></p>' +
+                      '<p>あいて：<b>' + hand[enemyChoice] + '</b></p>' 
+                      // + '<p><b>' + result[judge] + '</b>です</p>';          
+        }
+
+    }
+});
+
+</script>
+
+ 
+
+</body>
+</html>
